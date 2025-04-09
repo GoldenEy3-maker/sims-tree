@@ -4,45 +4,19 @@ import {
   addEdge,
   Background,
   Connection,
+  ConnectionLineType,
   Controls,
-  Edge,
   EdgeTypes,
-  Node,
   NodeTypes,
   ReactFlow,
+  ReactFlowProvider,
   useEdgesState,
   useNodesState,
 } from "@xyflow/react";
 import { CustomEdge } from "./custom-edge";
 import { CustomNode } from "./custom-node";
-
-const initialNodes: Node[] = [
-  { id: "a", position: { x: 0, y: 0 }, data: { label: "Node A" } },
-  {
-    id: "b",
-    position: { x: 0, y: 150 },
-    type: "custom-node",
-    data: { label: "Node B" },
-  },
-  { id: "c", position: { x: -100, y: 300 }, data: { label: "Node C" } },
-  { id: "d", position: { x: 100, y: 300 }, data: { label: "Node D" } },
-];
-
-const initialEdges: Edge[] = [
-  {
-    id: "a->b",
-    type: "custom-edge",
-    data: { label: "123" },
-    source: "a",
-    target: "b",
-  },
-  {
-    id: "b->c",
-    type: "custom-edge",
-    source: "b",
-    target: "c",
-  },
-];
+import { initialTree, treeRootId } from "./initial-tree";
+import { layoutElements } from "./layout-elements";
 
 const edgeTypes: EdgeTypes = {
   "custom-edge": CustomEdge,
@@ -52,9 +26,14 @@ const nodeTypes: NodeTypes = {
   "custom-node": CustomNode,
 };
 
+const { nodes: layoutedNodes, edges: layoutedEdges } = layoutElements(
+  initialTree,
+  treeRootId,
+);
+
 export function TreeFlow() {
-  const [nodes, , onNodeChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, , onNodeChange] = useNodesState(layoutedNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
 
   function onConnect(connection: Connection) {
     const edge = { ...connection, type: "custom-edge" };
@@ -63,18 +42,22 @@ export function TreeFlow() {
 
   return (
     <div className="h-svh">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodeChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        edgeTypes={edgeTypes}
-        nodeTypes={nodeTypes}
-        fitView>
-        <Background />
-        <Controls />
-      </ReactFlow>
+      <ReactFlowProvider>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodeChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          connectionLineType={ConnectionLineType.SmoothStep}
+          edgeTypes={edgeTypes}
+          nodeTypes={nodeTypes}
+          fitView
+        >
+          <Background />
+          <Controls />
+        </ReactFlow>
+      </ReactFlowProvider>
     </div>
   );
 }

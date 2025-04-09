@@ -4,7 +4,7 @@ import {
   BaseEdge,
   EdgeLabelRenderer,
   EdgeProps,
-  getSimpleBezierPath,
+  getSmoothStepPath,
   useReactFlow,
 } from "@xyflow/react";
 import { Button } from "../ui/button";
@@ -19,14 +19,12 @@ export function CustomEdge({
   data,
 }: EdgeProps) {
   const { setEdges } = useReactFlow();
-  const [edgePath, labelX, labelY] = getSimpleBezierPath({
+  const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
     sourceY,
     targetX,
     targetY,
   });
-
-  console.log(data);
 
   return (
     <>
@@ -41,7 +39,8 @@ export function CustomEdge({
             pointerEvents: "all",
           }}
           className="nodrag nopan"
-          onClick={() => setEdges((edges) => edges.filter((e) => e.id !== id))}>
+          onClick={() => setEdges((edges) => edges.filter((e) => e.id !== id))}
+        >
           <Trash2 />
         </Button>
       </EdgeLabelRenderer>
